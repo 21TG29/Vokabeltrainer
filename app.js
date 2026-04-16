@@ -374,7 +374,7 @@ document.addEventListener('DOMContentLoaded', () => {
   aktualisiereAuswahlInfo();
 }
 function mischen(array) {
-(array) {
+(array)
 URL = 'https://mkagzmamqddzrojielop.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_NxX8YjEWydRur8H4bAqe1g_3dwaGE8g';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
