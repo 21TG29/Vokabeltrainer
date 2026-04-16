@@ -41,7 +41,7 @@
 
       <div class="content">
         <section id="trainerSection" class="trainer-section">
-          <div class="trainer-hero"><h3>Dein Training</h3><p>Wähle Unterlektionen aus, starte die Session und speichere danach nur den ersten Versuch automatisch.</p></div>
+          <div class="trainer-hero"><h3>Dein Training</h3><p>Wähle Unterlektionen aus, starte die Session und speichere danach nur den ersten Versuch automatisch.</p><div id="trainerSummary" class="trainer-summary"></div></div>
           <div class="trainer-grid">
             <div class="trainer-card">
               <div class="card-head spacing-tight">
@@ -71,10 +71,44 @@
         </section>
 
         <section id="statsSection" class="content hidden">
-          <div class="card">
-            <div class="card-head spacing-more"><div><h4>Alltime-Statistik</h4><p>Werte aus allen gespeicherten Erstversuchen.</p></div><button id="refreshStatsBtn" class="btn btn-secondary" type="button">Aktualisieren</button></div>
-            <div class="stats-grid"><div class="stat-box"><span>Sessions</span><strong id="statSessions">0</strong></div><div class="stat-box"><span>Gelernte Vokabeln</span><strong id="statLearned">0</strong></div><div class="stat-box"><span>Falsch</span><strong id="statWrong">0</strong></div><div class="stat-box"><span>Richtig</span><strong id="statCorrect">0</strong></div><div class="stat-box"><span>Ø-Quote</span><strong id="statPercent">0%</strong></div><div class="stat-box"><span>Ø-Note</span><strong id="statGrade">-</strong></div></div>
-            <div class="lesson-stats-wrap"><h4>Lektionsauswertung</h4><div id="lessonStats" class="list"></div></div>
+          <div class="stats-columns">
+            <div class="card">
+              <div class="card-head spacing-more">
+                <div><h4>Letzte 7 Tage</h4><p>Die Statistik der letzten 7 Tage im gleichen Look &amp; Feel.</p></div>
+                <button id="refreshWeeklyBtn" class="btn btn-secondary" type="button">Aktualisieren</button>
+              </div>
+              <div class="stats-grid">
+                <div class="stat-box"><span>Sessions</span><strong id="weekSessions">0</strong></div>
+                <div class="stat-box"><span>Gelernte Vokabeln</span><strong id="weekLearned">0</strong></div>
+                <div class="stat-box"><span>Falsch</span><strong id="weekWrong">0</strong></div>
+                <div class="stat-box"><span>Richtig</span><strong id="weekCorrect">0</strong></div>
+                <div class="stat-box"><span>Ø-Quote</span><strong id="weekPercent">0%</strong></div>
+                <div class="stat-box"><span>Ø-Note</span><strong id="weekGrade">-</strong></div>
+              </div>
+              <div class="lesson-stats-wrap"><h4>Lektionsauswertung</h4><div id="weekLessonStats" class="list"></div></div>
+            </div>
+
+            <div class="card">
+              <div class="card-head spacing-more">
+                <div><h4>Alltime-Statistik</h4><p>Werte aus allen gespeicherten Erstversuchen.</p></div>
+                <button id="refreshStatsBtn" class="btn btn-secondary" type="button">Aktualisieren</button>
+              </div>
+              <div class="filter-bar">
+                <div class="field"><label for="statsFrom">Von</label><input id="statsFrom" type="date" /></div>
+                <div class="field"><label for="statsTo">Bis</label><input id="statsTo" type="date" /></div>
+                <button id="applyStatsFilterBtn" class="btn btn-primary" type="button">Filtern</button>
+                <button id="clearStatsFilterBtn" class="btn btn-secondary" type="button">Alltime</button>
+              </div>
+              <div class="stats-grid">
+                <div class="stat-box"><span>Sessions</span><strong id="statSessions">0</strong></div>
+                <div class="stat-box"><span>Gelernte Vokabeln</span><strong id="statLearned">0</strong></div>
+                <div class="stat-box"><span>Falsch</span><strong id="statWrong">0</strong></div>
+                <div class="stat-box"><span>Richtig</span><strong id="statCorrect">0</strong></div>
+                <div class="stat-box"><span>Ø-Quote</span><strong id="statPercent">0%</strong></div>
+                <div class="stat-box"><span>Ø-Note</span><strong id="statGrade">-</strong></div>
+              </div>
+              <div class="lesson-stats-wrap"><h4>Lektionsauswertung</h4><div id="lessonStats" class="list"></div></div>
+            </div>
           </div>
         </section>
       </div>
