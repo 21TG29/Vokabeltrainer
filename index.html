@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vokabeltrainer EN/FR</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <section id="loginView" class="login-shell">
+    <div class="login-card">
+      <div class="login-side">
+        <div class="badge">Version 1.5.3</div>
+        <h1>Vokabeltrainer</h1>
+        <p>Login, Training, automatische Speicherung und Statistik für EN / FR.</p>
+      </div>
+      <div class="login-form-wrap">
+        <h2 style="margin:0 0 18px;">Login</h2>
+        <div class="field"><label for="email">E-Mail</label><input id="email" type="email" placeholder="admin@schule.de" /></div>
+        <div class="field"><label for="password">Passwort</label><input id="password" type="password" placeholder="Passwort" /></div>
+        <button id="loginBtn" class="btn btn-primary" type="button">Anmelden</button>
+        <div id="loginInfo" class="info-box">Admin: 21TG29 · EN und FR verfügbar</div>
+        <div id="loginError" class="error-box hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><div class="logo">VF</div><div><strong>Vokabeltrainer</strong><br /><span class="muted">EN · FR</span></div></div>
+      <div class="nav-group"><div class="nav-label">Bereiche</div><button id="navTrainer" class="nav-btn active" type="button"><span>Trainer</span><small>Aktiv</small></button><button id="navStats" class="nav-btn" type="button"><span>Statistik</span><small>Alltime</small></button></div>
+      <div class="sidebar-card"><h4>Freigaben</h4><p id="languageInfo">Noch keine Daten geladen.</p></div>
+      <button id="logoutBtn" class="btn btn-secondary logout-btn" type="button">Abmelden</button>
+    </aside>
+    <main class="main">
+      <div class="topbar">
+        <div><h2 id="pageTitle">Trainer</h2><p id="pageSubtitle">Erstes Ergebnis speichert automatisch. Wiederholungen werden nicht gespeichert.</p></div>
+        <div class="top-actions"><button id="refreshBtn" class="btn btn-secondary" type="button">Neu laden</button></div>
+      </div>
+
+      <div class="content">
+        <section id="trainerSection" class="trainer-section">
+          <div class="trainer-hero"><h3>Dein Training</h3><p>Wähle Unterlektionen aus, starte die Session und speichere danach nur den ersten Versuch automatisch.</p></div>
+          <div class="trainer-grid">
+            <div class="trainer-card">
+              <div class="card-head spacing-tight">
+                <div><h4>Lektionen auswählen</h4><p>Klicke auf Unterlektionen, dann Training starten.</p></div>
+                <button id="startTrainingBtn" class="btn btn-primary" type="button">Training starten</button>
+              </div>
+              <div id="lessonList"></div>
+              <p id="selectionInfo" class="selection-info">0 Unterlektionen ausgewählt</p>
+            </div>
+
+            <div id="trainingArea" class="trainer-card hidden">
+              <div class="trainer-input">
+                <div class="progress-small"><span id="trainingProgress"></span></div>
+                <h3 id="trainingQuestion" class="question-large">Deutsch</h3>
+                <div class="field" style="margin-bottom:0;"><label for="trainingAnswer">Übersetzung eingeben</label><input id="trainingAnswer" type="text" placeholder="Französisch..." autocomplete="off" /></div>
+                <div class="trainer-actions"><button id="checkAnswerBtn" class="btn btn-primary" type="button">Prüfen</button><button id="skipBtn" class="btn btn-secondary" type="button">Überspringen</button></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="trainingResult" class="trainer-card hidden">
+            <div class="result-stats"><div class="stat-box"><span>Richtig</span><strong id="resultCorrect">0</strong></div><div class="stat-box"><span>Falsch</span><strong id="resultWrong">0</strong></div><div class="stat-box"><span>Gesamt</span><strong id="resultTotal">0</strong></div></div>
+            <div class="result-grade"><strong id="resultGrade" style="font-size:2.5rem;">-</strong><span id="resultGradeText" style="font-size:1.1rem;margin-left:12px;">Note wird berechnet</span></div>
+            <div class="trainer-actions" style="margin-top:0;"><button id="repeatWrongBtn" class="btn btn-secondary" type="button">Falsche wiederholen</button><button id="newTrainingBtn" class="btn btn-secondary" type="button">Neue Session</button></div>
+            <h4 style="margin:28px 0 14px;">Deine Fehler</h4><div id="resultErrors" class="error-list"></div>
+          </div>
+        </section>
+
+        <section id="statsSection" class="content hidden">
+          <div class="card">
+            <div class="card-head spacing-more"><div><h4>Alltime-Statistik</h4><p>Werte aus allen gespeicherten Erstversuchen.</p></div><button id="refreshStatsBtn" class="btn btn-secondary" type="button">Aktualisieren</button></div>
+            <div class="stats-grid"><div class="stat-box"><span>Sessions</span><strong id="statSessions">0</strong></div><div class="stat-box"><span>Gelernte Vokabeln</span><strong id="statLearned">0</strong></div><div class="stat-box"><span>Falsch</span><strong id="statWrong">0</strong></div><div class="stat-box"><span>Richtig</span><strong id="statCorrect">0</strong></div><div class="stat-box"><span>Ø-Quote</span><strong id="statPercent">0%</strong></div><div class="stat-box"><span>Ø-Note</span><strong id="statGrade">-</strong></div></div>
+            <div class="lesson-stats-wrap"><h4>Lektionsauswertung</h4><div id="lessonStats" class="list"></div></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
