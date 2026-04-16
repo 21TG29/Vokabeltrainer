@@ -705,3 +705,5 @@ document.addEventListener('DOMContentLoaded', () => {
   el('langFrBtn').onclick = () => setLanguage('fr');
   el('langEnBtn').onclick = () => setLanguage('en');
 });
+
+}
