@@ -131,8 +131,7 @@ async function startTraining() {
   if (!currentLanguage) return alert('Bitte zuerst eine Sprache wählen.');
   if (selectedLessons.size === 0) return alert('Wähle mindestens eine Vokabel!');
   const rows = await loadLessons();
-  const selectedKeys = new Set(Array.from(ausgewaehlt));
-  const selectedLessonNames = new Set(Array.from(selectedKeys).map(k => k.split('__')[1] || k));
+  const selectedLessonNames = new Set(Array.from(ausgewaehlt).map(k => k.split('__')[1] || k));
   trainingData = rows.filter(r => selectedLessonNames.has(String(r.lesson_name || r.sublesson || ''))).sort(() => Math.random() - 0.5);
   if (!trainingData.length) { alert('Für die Auswahl konnten keine Vokabeln geladen werden.'); return; }
   trainingIndex = 0;
@@ -350,13 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (selectedCount === keys.length && keys.length > 0) { gruppeBtn.classList.add('active'); gruppeBtn.textContent = 'Alles gewählt'; }
     else if (selectedCount > 0) { gruppeBtn.classList.add('partial'); gruppeBtn.textContent = `${selectedCount} gewählt`; }
     else { gruppeBtn.textContent = 'Alles wählen'; }
-    gruppeBtn.addEventListener('click', e => {
-      e.preventDefault(); e.stopPropagation();
-      const allSelected = keys.length > 0 && keys.every(k => ausgewaehlt.has(k));
-      if (allSelected) keys.forEach(k => ausgewaehlt.delete(k)); else keys.forEach(k => ausgewaehlt.add(k));
-      if (details.open) offeneGruppen.add(gruppeName); else offeneGruppen.delete(gruppeName);
-      renderLektionen();
-    });
+    gruppeBtn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); const allSelected = keys.length > 0 && keys.every(k => ausgewaehlt.has(k)); if (allSelected) keys.forEach(k => ausgewaehlt.delete(k)); else keys.forEach(k => ausgewaehlt.add(k)); if (details.open) offeneGruppen.add(gruppeName); else offeneGruppen.delete(gruppeName); renderLektionen(); });
     header.appendChild(links);
     header.appendChild(gruppeBtn);
     summary.appendChild(header);
@@ -371,25 +364,17 @@ document.addEventListener('DOMContentLoaded', () => {
       if (ausgewaehlt.has(key)) btn.classList.add('active');
       const anzahlWoerter = (tabellen[gruppeName][lektionName] || []).length;
       btn.innerHTML = `<span class="lektionName">${lektionName}</span><span class="lektionCount">${anzahlWoerter} Wörter</span>`;
-      btn.addEventListener('click', e => {
-        e.preventDefault(); e.stopPropagation();
-        if (ausgewaehlt.has(key)) ausgewaehlt.delete(key); else ausgewaehlt.add(key);
-        if (details.open) offeneGruppen.add(gruppeName); else offeneGruppen.delete(gruppeName);
-        renderLektionen();
-      });
+      btn.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); if (ausgewaehlt.has(key)) ausgewaehlt.delete(key); else ausgewaehlt.add(key); if (details.open) offeneGruppen.add(gruppeName); else offeneGruppen.delete(gruppeName); renderLektionen(); });
       unterWrap.appendChild(btn);
     });
     details.appendChild(unterWrap);
-    details.addEventListener('toggle', () => {
-      if (details.open) offeneGruppen.add(gruppeName); else offeneGruppen.delete(gruppeName);
-      toggleIcon.textContent = details.open ? '−' : '+';
-      gruppeBtn.setAttribute('aria-expanded', details.open ? 'true' : 'false');
-    });
+    details.addEventListener('toggle', () => { if (details.open) offeneGruppen.add(gruppeName); else offeneGruppen.delete(gruppeName); toggleIcon.textContent = details.open ? '−' : '+'; gruppeBtn.setAttribute('aria-expanded', details.open ? 'true' : 'false'); });
     container.appendChild(details);
   });
   aktualisiereAuswahlInfo();
 }
 function mischen(array) {
+(array) {
 URL = 'https://mkagzmamqddzrojielop.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_NxX8YjEWydRur8H4bAqe1g_3dwaGE8g';
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -523,8 +508,7 @@ async function startTraining() {
   if (!currentLanguage) return alert('Bitte zuerst eine Sprache wählen.');
   if (selectedLessons.size === 0) return alert('Wähle mindestens eine Vokabel!');
   const rows = await loadLessons();
-  const selectedKeys = new Set(Array.from(ausgewaehlt));
-  const selectedLessonNames = new Set(Array.from(selectedKeys).map(k => k.split('__')[1] || k));
+  const selectedLessonNames = new Set(Array.from(ausgewaehlt).map(k => k.split('__')[1] || k));
   trainingData = rows.filter(r => selectedLessonNames.has(String(r.lesson_name || r.sublesson || ''))).sort(() => Math.random() - 0.5);
   if (!trainingData.length) { alert('Für die Auswahl konnten keine Vokabeln geladen werden.'); return; }
   trainingIndex = 0;
