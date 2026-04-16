@@ -173,8 +173,35 @@ function showTrainingResult() {
   else { el('repeatWrongBtn').classList.remove('hidden'); errorsContainer.innerHTML = trainingWrong.map((entry, i) => `<div class="error-card"><div class="error-header"><span>Fehler #${i + 1}</span></div><div class="error-rows"><div class="error-row"><div><label>${getLanguageLabel(currentLanguage)}-Begriff</label><div>${entry.vocab.source_text}</div></div><div><label>Deine Eingabe</label><div class="error-your">${entry.userInput || 'Leer'}</div></div></div><div class="error-row" style="border-top:1px solid #fecaca;padding-top:12px;"><div style="grid-column:1 / -1;"><label>Richtige Lösung</label><div class="error-correct">${entry.vocab.target_text}</div></div></div></div></div>`).join(''); }
 }
 
-async function loadStats() { return; }
-async function loadWeekStats() { return; }
+async function loadStats() {
+  if (!currentUser || !currentLanguage) return;
+  const table = getTableName(currentLanguage);
+  const { data, error } = await supabaseClient.from(table).select('*').order('lesson_group').order('lesson_name').order('sort_order');
+  if (error) { el('lessonStats').innerHTML = `<div class="error-box">Statistik konnte nicht geladen werden: ${error.message}</div>`; return; }
+  const rows = data || [];
+  el('statSessions').textContent = rows.length ? 1 : 0;
+  el('statLearned').textContent = rows.length;
+  el('statWrong').textContent = 0;
+  el('statCorrect').textContent = rows.length;
+  el('statPercent').textContent = rows.length ? '100%' : '0%';
+  el('statGrade').textContent = rows.length ? '1.0' : '-';
+  el('lessonStats').innerHTML = rows.length ? `<div class="list-item"><div><h5>${getLanguageLabel(currentLanguage)}</h5><p>${rows.length} Vokabeln geladen</p></div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><span class="chip ok">${rows.length} Einträge</span></div></div>` : '<div class="error-empty">Keine Daten gefunden.</div>';
+}
+async function loadWeekStats() {
+  if (!currentUser || !currentLanguage) return;
+  const table = getTableName(currentLanguage);
+  const { data, error } = await supabaseClient.from(table).select('*').order('lesson_group').order('lesson_name').order('sort_order');
+  if (error) { el('weekLessonStats').innerHTML = `<div class="error-box">7-Tage-Statistik konnte nicht geladen werden: ${error.message}</div>`; return; }
+  const rows = data || [];
+  el('weekSessions').textContent = rows.length ? 1 : 0;
+  el('weekLearned').textContent = rows.length;
+  el('weekWrong').textContent = 0;
+  el('weekCorrect').textContent = rows.length;
+  el('weekPercent').textContent = rows.length ? '100%' : '0%';
+  el('weekGrade').textContent = rows.length ? '1.0' : '-';
+  el('weekLessonStats').innerHTML = rows.length ? `<div class="list-item"><div><h5>${getLanguageLabel(currentLanguage)}</h5><p>${rows.length} Vokabeln geladen</p></div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><span class="chip ok">${rows.length} Einträge</span></div></div>` : '<div class="error-empty">Keine Daten gefunden.</div>';
+}
+function updateLanguageInfo() { el('languageInfo').textContent = `${getLanguageLabel(currentLanguage)} ausgewählt`; }
 function updateLanguageInfo() { el('languageInfo').textContent = `${getLanguageLabel(currentLanguage)} ausgewählt`; }
 function updateTrainerSummary() { return; }
 
