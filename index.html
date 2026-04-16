@@ -13,7 +13,7 @@
       <div class="login-side">
         <div class="badge">Version 1.5.3</div>
         <h1>Vokabeltrainer</h1>
-        <p>Login, Training, automatische Speicherung und Statistik für EN / FR.</p>
+        <p>Login, Training und Statistik für Englisch und Französisch.</p>
       </div>
       <div class="login-form-wrap">
         <h2 style="margin:0 0 18px;">Login</h2>
@@ -26,12 +26,23 @@
     </div>
   </section>
 
+  <section id="languageModal" class="hidden language-modal">
+    <div class="language-modal-card">
+      <h2>Welche Sprache möchtest du lernen?</h2>
+      <p>Dieser Account hat Zugriff auf beide Sprachbereiche.</p>
+      <div class="language-actions">
+        <button id="langFrBtn" class="btn btn-primary" type="button">Französisch lernen</button>
+        <button id="langEnBtn" class="btn btn-primary" type="button">Englisch lernen</button>
+      </div>
+    </div>
+  </section>
+
   <section id="appView" class="app-shell hidden">
     <aside class="sidebar">
-      <div class="brand"><div class="logo">VF</div><div><strong>Vokabeltrainer</strong><br /><span class="muted">EN · FR</span></div></div>
+      <div class="brand"><div class="logo">VF</div><div><strong>Vokabeltrainer</strong><br /><span class="muted" id="currentLangLabel">EN · FR</span></div></div>
       <div class="nav-group"><div class="nav-label">Bereiche</div><button id="navTrainer" class="nav-btn active" type="button"><span>Trainer</span><small>Aktiv</small></button><button id="navStats" class="nav-btn" type="button"><span>Statistik</span><small>Alltime</small></button></div>
       <div class="sidebar-card"><h4>Freigaben</h4><p id="languageInfo">Noch keine Daten geladen.</p></div>
-      <button id="logoutBtn" class="btn btn-secondary logout-btn" type="button" onclick="window.handleLogout && window.handleLogout(); return false;">Abmelden</button>
+      <button id="logoutBtn" class="btn btn-secondary logout-btn" type="button">Abmelden</button>
     </aside>
     <main class="main">
       <div class="topbar">
@@ -49,7 +60,7 @@
                 <button id="startTrainingBtn" class="btn btn-primary" type="button">Training starten</button>
               </div>
               <div id="lessonList"></div>
-              <p id="selectionInfo" class="selection-info">0 Unterlektionen ausgewählt</p>
+              <p id="selectionInfo" class="selection-info">0 Vokabeln ausgewählt</p>
             </div>
 
             <div id="trainingArea" class="trainer-card hidden">
@@ -75,7 +86,6 @@
             <div class="card">
               <div class="card-head spacing-more">
                 <div><h4>Letzte 7 Tage</h4><p>Die Statistik der letzten 7 Tage im gleichen Look &amp; Feel.</p></div>
-                
               </div>
               <div class="stats-grid">
                 <div class="stat-box"><span>Sessions</span><strong id="weekSessions">0</strong></div>
@@ -91,7 +101,6 @@
             <div class="card">
               <div class="card-head spacing-more">
                 <div><h4>Alltime-Statistik</h4><p>Werte aus allen gespeicherten Erstversuchen.</p></div>
-                
               </div>
               <div class="stats-grid">
                 <div class="stat-box"><span>Sessions</span><strong id="statSessions">0</strong></div>
@@ -109,6 +118,6 @@
     </main>
   </section>
 
-  <script src="app.js"></script>
+  <script src="app_language_split.js"></script>
 </body>
 </html>
