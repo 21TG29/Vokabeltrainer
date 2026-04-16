@@ -84,7 +84,7 @@ async function loadProfile() {
 function getActiveLanguageRows() { return trainingData; }
 
 async function loadLessons() {
-  if (!currentUser || !currentLanguage) return;
+  if (!currentUser || !currentLanguage) return [];
   const table = getTableName(currentLanguage);
   const { data, error } = await supabaseClient.from(table).select('*').order('lesson_group').order('lesson_name').order('sort_order');
   if (error) { el('lessonList').innerHTML = `<div class="error-box">Lerninhalte konnten nicht geladen werden: ${error.message}</div>`; return []; }
@@ -131,8 +131,9 @@ async function startTraining() {
   if (!currentLanguage) return alert('Bitte zuerst eine Sprache wählen.');
   if (selectedLessons.size === 0) return alert('Wähle mindestens eine Vokabel!');
   const rows = await loadLessons();
-  const selectedIds = new Set(Array.from(selectedLessons).map(k => k.split('|')[2]));
+  const selectedIds = new Set(Array.from(selectedLessons).map(String));
   trainingData = rows.filter(r => selectedIds.has(String(r.id))).sort(() => Math.random() - 0.5);
+  if (!trainingData.length) { alert('Für die Auswahl konnten keine Vokabeln geladen werden.'); return; }
   trainingIndex = 0;
   trainingWrong = [];
   repeatMode = false;
@@ -181,32 +182,67 @@ function showTrainingResult() {
 
 async function loadStats() {
   if (!currentUser || !currentLanguage) return;
-  const table = getTableName(currentLanguage);
-  const { data, error } = await supabaseClient.from(table).select('*').order('lesson_group').order('lesson_name').order('sort_order');
+  const { data, error } = await supabaseClient.from('lesson_results').select('*').eq('user_id', currentUser.id).eq('language', currentLanguage).order('created_at', { ascending: false });
   if (error) { el('lessonStats').innerHTML = `<div class="error-box">Statistik konnte nicht geladen werden: ${error.message}</div>`; return; }
   const rows = data || [];
+  const totalWords = rows.reduce((s, r) => s + Number(r.total_words || 0), 0);
+  const correctWords = rows.reduce((s, r) => s + Number(r.correct_words || 0), 0);
+  const wrongWords = rows.reduce((s, r) => s + Number(r.wrong_words || 0), 0);
+  const percent = totalWords ? Math.round((correctWords / totalWords) * 100) : 0;
+  const grade = rows.length ? calculateGrade(percent) : '-';
   el('statSessions').textContent = rows.length;
-  el('statLearned').textContent = rows.length;
-  el('statWrong').textContent = 0;
-  el('statCorrect').textContent = rows.length;
-  el('statPercent').textContent = rows.length ? '100%' : '0%';
-  el('statGrade').textContent = rows.length ? '1.0' : '-';
-  el('lessonStats').innerHTML = rows.length ? `<div class="list-item"><div><h5>${getLanguageLabel(currentLanguage)}</h5><p>${rows.length} Vokabeln geladen</p></div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><span class="chip ok">${rows.length} Einträge</span></div></div>` : '<div class="error-empty">Keine Daten gefunden.</div>';
+  el('statLearned').textContent = totalWords;
+  el('statWrong').textContent = wrongWords;
+  el('statCorrect').textContent = correctWords;
+  el('statPercent').textContent = `${percent}%`;
+  el('statGrade').textContent = grade === '-' ? '-' : `${grade}.0`;
+  const grouped = new Map();
+  rows.forEach(r => {
+    const k = `${r.lesson_group}|${r.sublesson}`;
+    if (!grouped.has(k)) grouped.set(k, { lesson_group: r.lesson_group, sublesson: r.sublesson, sessions: 0, total_words: 0, correct_words: 0, wrong_words: 0, gradeSum: 0 });
+    const g = grouped.get(k);
+    g.sessions += 1; g.total_words += Number(r.total_words || 0); g.correct_words += Number(r.correct_words || 0); g.wrong_words += Number(r.wrong_words || 0); g.gradeSum += Number(r.grade || 0);
+  });
+  const items = Array.from(grouped.values());
+  el('lessonStats').innerHTML = items.length ? items.map(item => {
+    const p = item.total_words ? Math.round((item.correct_words / item.total_words) * 100) : 0;
+    const avg = item.sessions ? (item.gradeSum / item.sessions).toFixed(1) : '-';
+    return `<div class="list-item"><div><h5>${item.lesson_group} · ${item.sublesson}</h5><p>${item.sessions} Sessions · ${item.total_words} Wörter</p></div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><span class="chip ${currentLanguage === 'en' ? 'en' : 'fr'}">${getLanguageLabel(currentLanguage)}</span><span class="chip ok">${p}% richtig</span><span class="chip">Ø-Note ${avg}</span></div></div>`;
+  }).join('') : '<div class="error-empty">Noch keine Trainingsdaten vorhanden.</div>';
 }
 async function loadWeekStats() {
   if (!currentUser || !currentLanguage) return;
-  const table = getTableName(currentLanguage);
-  const { data, error } = await supabaseClient.from(table).select('*').order('lesson_group').order('lesson_name').order('sort_order');
+  const { data, error } = await supabaseClient.from('lesson_results').select('*').eq('user_id', currentUser.id).eq('language', currentLanguage).order('created_at', { ascending: false });
   if (error) { el('weekLessonStats').innerHTML = `<div class="error-box">7-Tage-Statistik konnte nicht geladen werden: ${error.message}</div>`; return; }
-  const rows = data || [];
+  const now = new Date();
+  const start = new Date(now); start.setDate(start.getDate() - 6); start.setHours(0,0,0,0);
+  const rows = (data || []).filter(r => new Date(r.created_at) >= start);
+  const totalWords = rows.reduce((s, r) => s + Number(r.total_words || 0), 0);
+  const correctWords = rows.reduce((s, r) => s + Number(r.correct_words || 0), 0);
+  const wrongWords = rows.reduce((s, r) => s + Number(r.wrong_words || 0), 0);
+  const percent = totalWords ? Math.round((correctWords / totalWords) * 100) : 0;
+  const grade = rows.length ? calculateGrade(percent) : '-';
   el('weekSessions').textContent = rows.length;
-  el('weekLearned').textContent = rows.length;
-  el('weekWrong').textContent = 0;
-  el('weekCorrect').textContent = rows.length;
-  el('weekPercent').textContent = rows.length ? '100%' : '0%';
-  el('weekGrade').textContent = rows.length ? '1.0' : '-';
-  el('weekLessonStats').innerHTML = rows.length ? `<div class="list-item"><div><h5>${getLanguageLabel(currentLanguage)}</h5><p>${rows.length} Vokabeln geladen</p></div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><span class="chip ok">${rows.length} Einträge</span></div></div>` : '<div class="error-empty">Keine Daten gefunden.</div>';
+  el('weekLearned').textContent = totalWords;
+  el('weekWrong').textContent = wrongWords;
+  el('weekCorrect').textContent = correctWords;
+  el('weekPercent').textContent = `${percent}%`;
+  el('weekGrade').textContent = grade === '-' ? '-' : `${grade}.0`;
+  const grouped = new Map();
+  rows.forEach(r => {
+    const k = `${r.lesson_group}|${r.sublesson}`;
+    if (!grouped.has(k)) grouped.set(k, { lesson_group: r.lesson_group, sublesson: r.sublesson, sessions: 0, total_words: 0, correct_words: 0, wrong_words: 0, gradeSum: 0 });
+    const g = grouped.get(k);
+    g.sessions += 1; g.total_words += Number(r.total_words || 0); g.correct_words += Number(r.correct_words || 0); g.wrong_words += Number(r.wrong_words || 0); g.gradeSum += Number(r.grade || 0);
+  });
+  const items = Array.from(grouped.values());
+  el('weekLessonStats').innerHTML = items.length ? items.map(item => {
+    const p = item.total_words ? Math.round((item.correct_words / item.total_words) * 100) : 0;
+    const avg = item.sessions ? (item.gradeSum / item.sessions).toFixed(1) : '-';
+    return `<div class="list-item"><div><h5>${item.lesson_group} · ${item.sublesson}</h5><p>${item.sessions} Sessions · ${item.total_words} Wörter</p></div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><span class="chip ${currentLanguage === 'en' ? 'en' : 'fr'}">${getLanguageLabel(currentLanguage)}</span><span class="chip ok">${p}% richtig</span><span class="chip">Ø-Note ${avg}</span></div></div>`;
+  }).join('') : '<div class="error-empty">Noch keine Trainingsdaten in den letzten 7 Tagen.</div>';
 }
+function updateLanguageInfo() { el('languageInfo').textContent = `${getLanguageLabel(currentLanguage)} ausgewählt`; }
 function updateLanguageInfo() { el('languageInfo').textContent = `${getLanguageLabel(currentLanguage)} ausgewählt`; }
 function updateLanguageInfo() { el('languageInfo').textContent = `${getLanguageLabel(currentLanguage)} ausgewählt`; }
 function updateTrainerSummary() { return; }
