@@ -70,6 +70,34 @@
           </div>
         </section>
 
+        
+
+            <div class="card-head spacing-more">
+              <div>
+                <h4>Wochenstatistik</h4>
+                <p>Auswertung der letzten 7 Tage auf Basis deiner gespeicherten Erstversuche.</p>
+              </div>
+              <button id="refreshWeeklyBtn" class="btn btn-secondary" type="button">Aktualisieren</button>
+            </div>
+            <div class="stats-grid">
+              <div class="stat-box"><span>Sessions</span><strong id="weekSessions">0</strong></div>
+              <div class="stat-box"><span>Wörter</span><strong id="weekWords">0</strong></div>
+              <div class="stat-box"><span>Richtig</span><strong id="weekCorrect">0</strong></div>
+              <div class="stat-box"><span>Falsch</span><strong id="weekWrong">0</strong></div>
+              <div class="stat-box"><span>Quote</span><strong id="weekPercent">0%</strong></div>
+              <div class="stat-box"><span>Ø-Note</span><strong id="weekGrade">-</strong></div>
+            </div>
+            <div class="weekly-chart-wrap">
+              <h4>Tagesverlauf</h4>
+              <div id="weeklyBars" class="weekly-bars"></div>
+            </div>
+            <div class="lesson-stats-wrap">
+              <h4>Einträge</h4>
+              <div id="weeklyList" class="list"></div>
+            </div>
+          </div>
+        </section>
+
         <section id="statsSection" class="content hidden">
           <div class="card">
             <div class="card-head spacing-more"><div><h4>Alltime-Statistik</h4><p>Werte aus allen gespeicherten Erstversuchen.</p></div><button id="refreshStatsBtn" class="btn btn-secondary" type="button">Aktualisieren</button></div>
