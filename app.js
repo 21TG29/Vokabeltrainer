@@ -690,4 +690,16 @@ document.addEventListener('DOMContentLoaded', () => {
   el('langEnBtn').onclick = () => setLanguage('en');
 });
 
+
+function initApp() {
+  if (currentUser) {
+    document.getElementById('loginView').classList.add('hidden');
+    document.getElementById('appView').classList.remove('hidden');
+    renderLektionen();
+    loadStats();
+    loadWeekStats();
+  } else {
+    document.getElementById('loginView').classList.remove('hidden');
+    document.getElementById('appView').classList.add('hidden');
+  }
 }
