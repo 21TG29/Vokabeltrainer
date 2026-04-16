@@ -162,7 +162,7 @@ function checkAnswer() {
   showTrainingQuestion();
 }
 
-function showTrainingResult() {
+async function showTrainingResult() {
   el('trainingArea').classList.add('hidden');
   el('trainingResult').classList.remove('hidden');
   const total = trainingData.length;
@@ -173,11 +173,12 @@ function showTrainingResult() {
   el('resultCorrect').textContent = correct;
   el('resultWrong').textContent = wrong;
   el('resultTotal').textContent = total;
-  el('resultGrade').textContent = grade;
+  el('resultGrade').textContent = grade === '-' ? '-' : grade;
   el('resultGradeText').textContent = getGradeText(grade);
   const errorsContainer = el('resultErrors');
   if (trainingWrong.length === 0) { errorsContainer.innerHTML = '<div class="error-empty">🎉 Perfekt! Alle Vokabeln richtig!</div>'; el('repeatWrongBtn').classList.add('hidden'); }
   else { el('repeatWrongBtn').classList.remove('hidden'); errorsContainer.innerHTML = trainingWrong.map((entry, i) => `<div class="error-card"><div class="error-header"><span>Fehler #${i + 1}</span></div><div class="error-rows"><div class="error-row"><div><label>${getLanguageLabel(currentLanguage)}-Begriff</label><div>${entry.vocab.source_text}</div></div><div><label>Deine Eingabe</label><div class="error-your">${entry.userInput || 'Leer'}</div></div></div><div class="error-row" style="border-top:1px solid #fecaca;padding-top:12px;"><div style="grid-column:1 / -1;"><label>Richtige Lösung</label><div class="error-correct">${entry.vocab.target_text}</div></div></div></div></div>`).join(''); }
+  await saveTrainingResult(total, correct, wrong, percent, grade);
 }
 
 async function loadStats() {
@@ -241,6 +242,34 @@ async function loadWeekStats() {
     const avg = item.sessions ? (item.gradeSum / item.sessions).toFixed(1) : '-';
     return `<div class="list-item"><div><h5>${item.lesson_group} · ${item.sublesson}</h5><p>${item.sessions} Sessions · ${item.total_words} Wörter</p></div><div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;"><span class="chip ${currentLanguage === 'en' ? 'en' : 'fr'}">${getLanguageLabel(currentLanguage)}</span><span class="chip ok">${p}% richtig</span><span class="chip">Ø-Note ${avg}</span></div></div>`;
   }).join('') : '<div class="error-empty">Noch keine Trainingsdaten in den letzten 7 Tagen.</div>';
+}
+async function saveTrainingResult(total, correct, wrong, percent, grade) {
+  if (!currentUser || !currentLanguage || savedFirstAttempt) return;
+  const grouped = new Map();
+  trainingData.forEach(r => {
+    const k = `${r.lesson_group}|${r.lesson_name}`;
+    if (!grouped.has(k)) grouped.set(k, { lesson_group: r.lesson_group, lesson_name: r.lesson_name, count: 0 });
+    grouped.get(k).count += 1;
+  });
+  const top = trainingData[0] || {};
+  const payload = {
+    user_id: currentUser.id,
+    language: currentLanguage,
+    lesson_group: top.lesson_group || 'Unbekannt',
+    sublesson: top.lesson_name || 'Unbekannt',
+    total_words: total,
+    correct_words: correct,
+    wrong_words: wrong,
+    percent_score: percent,
+    grade: grade,
+    created_at: new Date().toISOString()
+  };
+  const { error } = await supabaseClient.from('lesson_results').insert([payload]);
+  if (!error) {
+    savedFirstAttempt = true;
+    loadStats();
+    loadWeekStats();
+  }
 }
 function updateLanguageInfo() { el('languageInfo').textContent = `${getLanguageLabel(currentLanguage)} ausgewählt`; }
 function updateLanguageInfo() { el('languageInfo').textContent = `${getLanguageLabel(currentLanguage)} ausgewählt`; }
