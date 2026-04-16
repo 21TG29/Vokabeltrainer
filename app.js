@@ -47,23 +47,28 @@ function setView(view) {
 }
 
 async function login() {
-  const email = el('email').value;
-  const password = el('password').value;
-  const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-  if (error) { el('loginError').textContent = error.message; el('loginError').classList.remove('hidden'); return; }
-  currentUser = data.user;
-  el('loginView').classList.add('hidden');
-  el('appView').classList.remove('hidden');
-  el('loginError').classList.add('hidden');
-  el('languageInfo').textContent = 'Lade Profil...';
-  await loadProfile();
-  if (userProfile?.can_learn_en && userProfile?.can_learn_fr) {
-    el('languageModal').classList.remove('hidden');
-    el('currentLangLabel').textContent = 'Sprache wählen';
-  } else if (userProfile?.can_learn_en) {
-    setLanguage('en');
-  } else {
-    setLanguage('fr');
+  try {
+    const email = el('email').value.trim();
+    const password = el('password').value;
+    const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    currentUser = data.user;
+    el('loginView').classList.add('hidden');
+    el('appView').classList.remove('hidden');
+    el('loginError').classList.add('hidden');
+    el('languageInfo').textContent = 'Lade Profil...';
+    await loadProfile();
+    if (userProfile?.can_learn_en && userProfile?.can_learn_fr) {
+      el('languageModal').classList.remove('hidden');
+      el('currentLangLabel').textContent = 'Sprache wählen';
+    } else if (userProfile?.can_learn_en) {
+      setLanguage('en');
+    } else {
+      setLanguage('fr');
+    }
+  } catch (e) {
+    el('loginError').textContent = e?.message || 'Login fehlgeschlagen';
+    el('loginError').classList.remove('hidden');
   }
 }
 
@@ -193,9 +198,9 @@ window.handleLogout = async function() {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  el('loginBtn').onclick = login;
-  el('password').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
-  el('email').addEventListener('keydown', e => { if (e.key === 'Enter') login(); });
+  el('loginBtn').addEventListener('click', (e) => { e.preventDefault(); login(); });
+  el('password').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); login(); } });
+  el('email').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); login(); } });
   el('navTrainer').onclick = () => setView('trainer');
   el('navStats').onclick = () => setView('stats');
   el('refreshBtn').onclick = () => currentView === 'stats' ? loadStats() : renderLessons();
