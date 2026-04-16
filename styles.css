@@ -129,3 +129,7 @@ input:focus { border-color: #72d7ca; box-shadow: 0 0 0 4px rgba(20,184,166,.12);
 .card { padding: 22px; border-radius: 22px; border: 1px solid var(--line); background: var(--surface); box-shadow: var(--shadow); }
 .card-head h4 { margin: 0 0 12px; }
 .card-head p { margin: 0; color: var(--muted); }
+
+.language-switch { display: grid; gap: 8px; }
+.lang-btn { width: 100%; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line-strong); background: #fff; cursor: pointer; font: inherit; font-weight: 700; }
+.lang-btn.active { background: var(--primary-soft); color: var(--primary); border-color: #b6ebe3; }

@@ -26,22 +26,19 @@
     </div>
   </section>
 
-  <section id="languageModal" class="hidden language-modal">
-    <div class="language-modal-card">
-      <h2>Welche Sprache möchtest du lernen?</h2>
-      <p>Dieser Account hat Zugriff auf beide Sprachbereiche.</p>
-      <div class="language-actions">
-        <button id="langFrBtn" class="btn btn-primary" type="button">Französisch lernen</button>
-        <button id="langEnBtn" class="btn btn-primary" type="button">Englisch lernen</button>
-      </div>
-    </div>
-  </section>
-
   <section id="appView" class="app-shell hidden">
     <aside class="sidebar">
-      <div class="brand"><div class="logo">VF</div><div><strong>Vokabeltrainer</strong><br /><span class="muted" id="currentLangLabel">EN · FR</span></div></div>
+      <div class="brand"><div class="logo">VF</div><div><strong>Vokabeltrainer</strong><br /><span class="muted" id="currentLangLabel">Sprache: -</span></div></div>
       <div class="nav-group"><div class="nav-label">Bereiche</div><button id="navTrainer" class="nav-btn active" type="button"><span>Trainer</span><small>Aktiv</small></button><button id="navStats" class="nav-btn" type="button"><span>Statistik</span><small>Alltime</small></button></div>
       <div class="sidebar-card"><h4>Freigaben</h4><p id="languageInfo">Noch keine Daten geladen.</p></div>
+      <div class="sidebar-card">
+        <h4>Sprache</h4>
+        <div class="language-switch">
+          <button id="langFrBtn" class="lang-btn" type="button">Französisch</button>
+          <button id="langEnBtn" class="lang-btn" type="button">Englisch</button>
+        </div>
+        <p class="muted" style="margin-top:10px;">Nur sichtbar, wenn beide Sprachen freigeschaltet sind.</p>
+      </div>
       <button id="logoutBtn" class="btn btn-secondary logout-btn" type="button">Abmelden</button>
     </aside>
     <main class="main">
