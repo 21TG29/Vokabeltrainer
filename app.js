@@ -100,27 +100,33 @@ async function renderLessons() {
   const rows = await loadLessons();
   const grouped = new Map();
   rows.forEach(r => {
-    const key = `${r.lesson_group}|${r.lesson_name}`;
-    if (!grouped.has(key)) grouped.set(key, { lesson_group: r.lesson_group, lesson_name: r.lesson_name, rows: [] });
-    grouped.get(key).rows.push(r);
+    if (!grouped.has(r.lesson_group)) grouped.set(r.lesson_group, []);
+    grouped.get(r.lesson_group).push(r);
   });
   container.innerHTML = '';
-  Array.from(grouped.values()).forEach(group => {
+  Array.from(grouped.entries()).forEach(([groupName, groupRows]) => {
+    const groupKey = `${currentLanguage}|${groupName}`;
+    const groupSelected = groupRows.every(r => selectedLessons.has(String(r.id)));
     const groupBox = document.createElement('div');
     groupBox.className = 'group';
-    groupBox.innerHTML = `<div class="group-head"><div class="group-left"><h5>${group.lesson_group}</h5><p>${group.lesson_name}</p></div><div class="pill">${group.rows.length} Wörter</div></div><div class="lessons">${group.rows.map(r => { const key = `${group.lesson_group}|${group.lesson_name}|${r.id}`; return `<div class="lesson ${selectedLessons.has(key) ? 'active' : ''}" data-key="${key}"><div><strong>${r.source_text}</strong><small>${r.target_text}</small></div><div class="check">+</div></div>`; }).join('')}</div>`;
+    groupBox.innerHTML = `<div class="group-head"><div class="group-left"><h5>${groupName}</h5><p>${groupRows.length} Vokabeln</p></div><button class="pill" type="button">${groupSelected ? 'Alles gewählt' : 'Alles wählen'}</button></div><div class="lessons">${groupRows.map(r => `<div class="lesson ${selectedLessons.has(String(r.id)) ? 'active' : ''}" data-id="${r.id}"><div><strong>${r.source_text}</strong><small>${r.target_text}</small></div><div class="check">+</div></div>`).join('')}</div>`;
     container.appendChild(groupBox);
-  });
-  container.querySelectorAll('.lesson').forEach(lesson => {
-    lesson.onclick = () => {
-      const key = lesson.dataset.key;
-      if (selectedLessons.has(key)) selectedLessons.delete(key); else selectedLessons.add(key);
+    const pill = groupBox.querySelector('.pill');
+    pill.onclick = () => {
+      const allSelected = groupRows.every(r => selectedLessons.has(String(r.id)));
+      groupRows.forEach(r => { if (allSelected) selectedLessons.delete(String(r.id)); else selectedLessons.add(String(r.id)); });
       renderLessons();
     };
+    groupBox.querySelectorAll('.lesson').forEach(lesson => {
+      lesson.onclick = () => {
+        const id = lesson.dataset.id;
+        if (selectedLessons.has(id)) selectedLessons.delete(id); else selectedLessons.add(id);
+        renderLessons();
+      };
+    });
   });
   el('selectionInfo').textContent = `${selectedLessons.size} Vokabeln ausgewählt`;
 }
-
 async function startTraining() {
   if (!currentLanguage) return alert('Bitte zuerst eine Sprache wählen.');
   if (selectedLessons.size === 0) return alert('Wähle mindestens eine Vokabel!');
@@ -179,7 +185,7 @@ async function loadStats() {
   const { data, error } = await supabaseClient.from(table).select('*').order('lesson_group').order('lesson_name').order('sort_order');
   if (error) { el('lessonStats').innerHTML = `<div class="error-box">Statistik konnte nicht geladen werden: ${error.message}</div>`; return; }
   const rows = data || [];
-  el('statSessions').textContent = rows.length ? 1 : 0;
+  el('statSessions').textContent = rows.length;
   el('statLearned').textContent = rows.length;
   el('statWrong').textContent = 0;
   el('statCorrect').textContent = rows.length;
@@ -193,7 +199,7 @@ async function loadWeekStats() {
   const { data, error } = await supabaseClient.from(table).select('*').order('lesson_group').order('lesson_name').order('sort_order');
   if (error) { el('weekLessonStats').innerHTML = `<div class="error-box">7-Tage-Statistik konnte nicht geladen werden: ${error.message}</div>`; return; }
   const rows = data || [];
-  el('weekSessions').textContent = rows.length ? 1 : 0;
+  el('weekSessions').textContent = rows.length;
   el('weekLearned').textContent = rows.length;
   el('weekWrong').textContent = 0;
   el('weekCorrect').textContent = rows.length;
