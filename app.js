@@ -26,7 +26,8 @@ function getTableName(lang) { return TABLES[lang] || TABLES.fr; }
 
 function setLanguage(lang) {
   currentLanguage = lang;
-  el('languageModal').classList.add('hidden');
+  if (el('languageModal')) el('languageModal').classList.add('hidden');
+  el('currentLangLabel').textContent = getLanguageLabel(lang);
   renderLessons();
   updateLanguageInfo();
   loadStats();
@@ -58,6 +59,7 @@ async function login() {
   await loadProfile();
   if (userProfile?.can_learn_en && userProfile?.can_learn_fr) {
     el('languageModal').classList.remove('hidden');
+    el('currentLangLabel').textContent = 'Sprache wählen';
   } else if (userProfile?.can_learn_en) {
     setLanguage('en');
   } else {
