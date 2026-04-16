@@ -131,8 +131,8 @@ async function startTraining() {
   if (!currentLanguage) return alert('Bitte zuerst eine Sprache wählen.');
   if (selectedLessons.size === 0) return alert('Wähle mindestens eine Vokabel!');
   const rows = await loadLessons();
-  const selectedIds = new Set(Array.from(selectedLessons).map(String));
-  trainingData = rows.filter(r => selectedIds.has(String(r.id))).sort(() => Math.random() - 0.5);
+  const selectedNames = new Set(Array.from(selectedLessons).map(String));
+  trainingData = rows.filter(r => selectedNames.has(String(r.lesson_name || r.sublesson || r.lesson_group || ''))).sort(() => Math.random() - 0.5);
   if (!trainingData.length) { alert('Für die Auswahl konnten keine Vokabeln geladen werden.'); return; }
   trainingIndex = 0;
   trainingWrong = [];
